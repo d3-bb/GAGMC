@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <link rel="icon" href="sitelogo.ico" type="image/x-icon" />
+  <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8" />
+  <title>Custom Value Calculator</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+      background: #000; /* midnight default */
+      color: #eee;
+      display: flex;
+      flex-direction: row;
+      gap: 30px;
+      transition: background-color 0.3s, color 0.3s;
+    }
+    .main {
+      flex: 2;
+    }
+    h1 {
+      text-align: center;
+    }
+    .controls {
+      display: flex;
+      gap: 10px;
+      margin: 10px 0;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: center;
+    }
+    select#themeSelector {
+      padding: 6px 10px;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    .buttons-container {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+    button {
+      padding: 10px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background-color 0.3s, filter 0.3s;
+    }
+    button.active {
+      filter: brightness(70%);
+    }
+    #output {
+      font-size: 1.5em;
+      font-weight: bold;
+      text-align: center;
+      margin-top: 20px;
+    }
+    .sidebar {
+      flex: 1;
+      background: #111;
+      padding: 15px;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.5);
+      max-height: 90vh;
+      overflow-y: auto;
+      color: #eee;
+      transition: background-color 0.3s, color 0.3s;
+    }
+    /* Save Entry Styles per theme */
+    .save-entry {
+      margin-bottom: 10px;
+      padding: 10px;
+      border-radius: 5px;
+      border-left: 5px solid #4caf50;
+      background: #222;
+      color: #ddd;
+      transition: background-color 0.3s, color 0.3s, border-color 0.3s;
+    }
+    input[type="text"] {
+      flex: 1;
+      padding: 5px;
+      border-radius: 5px;
+      border: 1px solid #555;
+      background: #222;
+      color: #eee;
+      transition: border-color 0.3s;
+    }
+    input[type="text"]:focus {
+      outline: none;
+      border-color: #4caf50;
+    }
+    .clear-button {
+      display: block;
+      margin: 20px auto 0;
+      padding: 10px 20px;
+      background-color: #ff4d4d;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+    .clear-button:hover {
+      background-color: #d11a2a;
+    }
+
+    /* Theme classes */
+    body.theme-light {
+      background: #f4f4f4;
+      color: #000;
+    }
+    body.theme-light .sidebar {
+      background: #fff;
+      color: #000;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+    body.theme-light .save-entry {
+      background: #e3ffe3;
+      color: #000;
+      border-color: #4caf50;
+    }
+    body.theme-light input[type="text"] {
+      background: #fff;
+      color: #000;
+      border: 1px solid #ccc;
+    }
+
+    body.theme-midnight {
+      background: #000;
+      color: #eee;
+    }
+    body.theme-midnight .sidebar {
+      background: #111;
+      color: #eee;
+      box-shadow: 0 0 10px rgba(255,255,255,0.1);
+    }
+    body.theme-midnight .save-entry {
+      background: #222;
+      color: #ddd;
+      border-color: #66bb6a;
+    }
+    body.theme-midnight input[type="text"] {
+      background: #222;
+      color: #eee;
+      border: 1px solid #555;
+    }
+
+    body.theme-rainbow {
+      background: linear-gradient(to right, red, orange, yellow, green, blue, indigo, violet);
+      color: #000;
+    }
+    body.theme-rainbow .sidebar {
+      background: #fff8dc;
+      color: #222;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+    body.theme-rainbow .save-entry {
+      background: linear-gradient(to right, #ff9a9e, #fad0c4);
+      color: #440000;
+      border-color: #ff4081;
+    }
+    body.theme-rainbow input[type="text"] {
+      background: #fff;
+      color: #000;
+      border: 1px solid #ccc;
+    }
+
+    body.theme-pink {
+      background: #ffe6f0;
+      color: #333;
+    }
+    body.theme-pink .sidebar {
+      background: #fff0f6;
+      color: #333;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+    body.theme-pink .save-entry {
+      background: #ffcce3;
+      color: #660033;
+      border-color: #ff69b4;
+    }
+    body.theme-pink input[type="text"] {
+      background: #fff;
+      color: #333;
+      border: 1px solid #ccc;
+    }
+
+    body.theme-dark {
+      background: #121212;
+      color: #eee;
+    }
+    body.theme-dark .sidebar {
+      background: #222;
+      color: #eee;
+      box-shadow: 0 0 10px rgba(255,255,255,0.1);
+    }
+    body.theme-dark .save-entry {
+      background: #333;
+      color: #eee;
+      border-color: #81c784;
+    }
+    body.theme-dark input[type="text"] {
+      background: #333;
+      color: #eee;
+      border: 1px solid #555;
+    }
+  </style>
+</head>
+<body class="theme-midnight">
+  <div class="main">
+    <h1>Grow a Garden Mutation Calculator</h1>
+    <div class="controls">
+      <label for="themeSelector">Theme:</label>
+      <select id="themeSelector" aria-label="Select theme">
+        <option value="midnight" selected>Midnight</option>
+        <option value="light">Light</option>
+        <option value="dark">Dark</option>
+        <option value="rainbow">Rainbow</option>
+        <option value="pink">Pink</option>
+      </select>
+      <input type="text" id="saveName" placeholder="Enter crop name..." />
+      <button onclick="saveConfiguration()">Save</button>
+    </div>
+    <div class="buttons-container" id="buttons"></div>
+    <div id="output">Mutation Multiplier: 0</div>
+    <button class="clear-button" onclick="clearSelections()">Clear Selections</button>
+  </div>
+  <div class="sidebar">
+    <h3>Saved Configurations</h3>
+    <div id="saves"></div>
+  </div>
+
+  <script>
+    const values = {
+      "🌟 Gold": 20,
+      "🌈 Rainbow": 50,
+      "💧 Wet": 2,
+      "🍃 Windstruck": 2,
+      "🌙 Moonlit": 2,
+      "🏺 Clay": 3,
+      "❄️ Chilled": 2,
+      "🍫 Choc": 2,
+      "🌼 Pollinated": 3,
+      "🏖️ Sandy": 3,
+      "🩸 Bloodlit": 4,
+      "🌀 Twisted": 5,
+      "🌊 Drenched": 5,
+      "☁️ Cloudtouched": 5,
+      "🥶 Frozen": 10,
+      "🌪️ Tempestuous": 19,
+      "🌌 Aurora": 90,
+      "⚡ Shocked": 100,
+      "✨ Celestial": 120,
+      "🔥 Burnt": 4,
+      "🌿 Verdant": 4,
+      "🌾 Wiltproof": 4,
+      "⚛️ Plasma": 5,
+      "🍯 HoneyGlazed": 5,
+      "😇 Heavenly": 5,
+      "🍟 Fried": 8,
+      "🧡 Amber": 10,
+      "🍳 Cooked": 10,
+      "🕰️ OldAmber": 20,
+      "🧟 Zombified": 25,
+      "🌋 Molten": 25,
+      "🏺 Ceramic": 30,
+      "👴 AncientAmber": 50,
+      "👫 Friendbound": 70,
+      "🦠 Infected": 75,
+      "🌞 Sundried": 85,
+      "🏝️ Paradisal": 100,
+      "👽 Alienlike": 100,
+      "🚀 Galactic": 120,
+      "💃 Disco": 125,
+      "☄️ Meteoric": 125,
+      "🌑 Voidtouched": 135,
+      "🌅 Dawnbound": 150,
+      "📜 Historic Amber": 150
+    };
+
+    const colorHints = {
+      "🌟 Gold": '#FFD700',
+      "🌈 Rainbow": 'linear-gradient(to right, red, orange, yellow, green, blue, indigo, violet)',
+      "💧 Wet": '#89CFF0',
+      "🍃 Windstruck": '#B0E0E6',
+      "🌙 Moonlit": '#C0C0C0',
+      "🏺 Clay": '#B66A50',
+      "❄️ Chilled": '#AFEEEE',
+      "🍫 Choc": '#D2691E',
+      "🌼 Pollinated": '#FDEE00',
+      "🏖️ Sandy": '#F4A460',
+      "🩸 Bloodlit": '#8B0000',
+      "🌀 Twisted": '#800080',
+      "🌊 Drenched": '#1E90FF',
+      "☁️ Cloudtouched": '#E0FFFF',
+      "🥶 Frozen": '#ADD8E6',
+      "🌪️ Tempestuous": '#708090',
+      "🌌 Aurora": '#7FFFD4',
+      "⚡ Shocked": '#FFFF33',
+      "✨ Celestial": '#E6E6FA',
+      "🔥 Burnt": '#8B4513',
+      "🌿 Verdant": '#228B22',
+      "🌾 Wiltproof": '#006400',
+      "⚛️ Plasma": '#FF69B4',
+      "🍯 HoneyGlazed": '#FFA500',
+      "😇 Heavenly": '#E0FFFF',
+      "🍟 Fried": '#FF8C00',
+      "🧡 Amber": '#FFBF00',
+      "🍳 Cooked": '#CD853F',
+      "🕰️ OldAmber": '#D2B48C',
+      "🧟 Zombified": '#556B2F',
+      "🌋 Molten": '#FF4500',
+      "🏺 Ceramic": '#FFF8DC',
+      "👴 AncientAmber": '#DAA520',
+      "👫 Friendbound": '#FFB6C1',
+      "🦠 Infected": '#8B008B',
+      "🌞 Sundried": '#FFDEAD',
+      "🏝️ Paradisal": '#00CED1',
+      "👽 Alienlike": '#7CFC00',
+      "🚀 Galactic": '#6A5ACD',
+      "💃 Disco": '#FF00FF',
+      "☄️ Meteoric": '#DC143C',
+      "🌑 Voidtouched": '#2F4F4F',
+      "🌅 Dawnbound": '#FFDAB9',
+      "📜 Historic Amber": '#F5DEB3'
+    };
+
+    const buttonsContainer = document.getElementById('buttons');
+    const output = document.getElementById('output');
+    const saveNameInput = document.getElementById('saveName');
+    const savesContainer = document.getElementById('saves');
+    const themeSelector = document.getElementById('themeSelector');
+
+    const state = {};
+    const buttonElements = {};
+
+    function createButtons() {
+      buttonsContainer.innerHTML = '';
+      for (const key in values) {
+        state[key] = false;
+        const btn = document.createElement('button');
+        btn.textContent = key;
+        btn.dataset.key = key;
+        buttonElements[key] = btn;
+
+        if (colorHints[key]) {
+          if (colorHints[key].startsWith('linear-gradient')) {
+            btn.style.background = colorHints[key];
+            btn.style.color = '#000';
+          } else {
+            btn.style.backgroundColor = colorHints[key];
+            btn.style.color = '#000';
+          }
+        }
+
+        btn.addEventListener('click', () => {
+          state[key] = !state[key];
+          btn.classList.toggle('active');
+          calculate();
+        });
+        buttonsContainer.appendChild(btn);
+      }
+    }
+
+    createButtons();
+
+    function calculate() {
+      let base = 0;
+      let othersTotal = 0;
+      let othersCount = 0;
+
+      for (const key in state) {
+        if (state[key]) {
+          if (key.includes('Rainbow') || key.includes('Gold')) {
+            base += values[key];
+          } else {
+            othersTotal += values[key];
+            othersCount++;
+          }
+        }
+      }
+
+      const result = base + (1 + othersTotal - othersCount);
+      output.textContent = `Mutation Multiplier: ${result}`;
+      return result;
+    }
+
+    function saveConfiguration() {
+      const name = saveNameInput.value.trim();
+      if (!name) return alert("Please enter a name for this save.");
+
+      const activeKeys = Object.keys(state).filter(k => state[k]);
+      const result = calculate();
+
+      const entry = document.createElement('div');
+      entry.className = 'save-entry';
+      entry.innerHTML = `<h4>${name}</h4><p>Active: ${activeKeys.join(", ") || 'None'}</p><p>Multiplier: ${result}</p>`;
+      savesContainer.prepend(entry);
+
+      saveNameInput.value = '';
+    }
+
+    function clearSelections() {
+      for (const key in state) {
+        state[key] = false;
+        buttonElements[key].classList.remove('active');
+      }
+      calculate();
+    }
+
+    function applyTheme(theme) {
+      document.body.classList.remove('theme-light', 'theme-midnight', 'theme-rainbow', 'theme-pink', 'theme-dark');
+      document.body.classList.add(`theme-${theme}`);
+    }
+
+    themeSelector.addEventListener('change', () => {
+      applyTheme(themeSelector.value);
+    });
+
+    // Initialize default theme to midnight
+    applyTheme(themeSelector.value);
+  </script>
+</body>
+</html>
